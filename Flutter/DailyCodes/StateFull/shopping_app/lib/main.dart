@@ -103,7 +103,7 @@ class _MyAppState extends State {
             ),
             Row(
               children: [
-                SizedBox(
+             const    SizedBox(
                   width: 20,
                 ),
                 const Text(
@@ -117,7 +117,7 @@ class _MyAppState extends State {
                   width: 10,
                 ),
                 Icon(Icons.add),
-                SizedBox(
+             const SizedBox(
                   width: 10,
                 ),
                 Container(
@@ -128,13 +128,13 @@ class _MyAppState extends State {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
                   ),
                 ),
-                SizedBox(
+             const    SizedBox(
                   width: 10,
                 ),
-                Icon(Icons.remove),
+              const  Icon(Icons.remove),
               ],
             ),
-            SizedBox(
+           const SizedBox(
               height: 30,
             ),
             Container(
