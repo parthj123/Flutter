@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import "package:intl/intl.dart";
+import 'package:to_do_list/todo_card.dart';
 
 void main(){
   runApp(const MyApp());
@@ -26,8 +27,7 @@ class HomeScreen extends StatefulWidget {
 
 class _MyAppState extends State {
 
-  DateTime? _dateTime;
-  String  date="Not set";
+
 
 
   List<Color> colorfill=[
@@ -39,33 +39,71 @@ class _MyAppState extends State {
 
   ];
 
-  List<Map<String,dynamic>> info=[];
+   List<ToDoModal> listofCards=[
+
+        
+  ];
+
+ 
 
   TextEditingController titleController=TextEditingController();
   TextEditingController desricptionController=TextEditingController();
   TextEditingController dateController=TextEditingController();
 
-  Future<void>_SelectdateTime(BuildContext context)async {
 
-          final DateTime? pickedDate=await showDatePicker(context: context, firstDate: DateTime(2000), lastDate:DateTime(2100));
+  void submitData(bool isEdit,[int? data]){
 
-          if(pickedDate !=null&&pickedDate!=_dateTime){
+      
 
-              setState(() {
+                  if(titleController.text.trim().isNotEmpty&&desricptionController.text.trim().isNotEmpty&&dateController.text.trim().isNotEmpty){
 
-                    _dateTime=pickedDate;
-                     date=DateFormat('yyyy-MM-dd').format(pickedDate);
-                     dateController.text=date;
-              });
-          }
+
+                        if(isEdit){
+
+                           listofCards[data!].title=titleController.text;
+                           listofCards[data].description=desricptionController.text;
+                           listofCards[data].date=dateController.text;
+
+                        }else{
+
+                             listofCards.add(
+
+                                      ToDoModal(
+                                        title: titleController.text,
+                                       description: desricptionController.text,
+                                        date: dateController.text,
+                                        )
+                                        
+                                  );
+                        }
+
+
+
+                   };
+
+
+
+                              Navigator.of(context).pop;
+                              
+
+                              setState(() {
+                                
+                                  titleController.clear();
+                                    desricptionController.clear();
+                                    dateController.clear();
+
+                              });
   }
 
+ 
 
-  void popUp(){
+  void popUp(bool isEdit,[int? data]){
+
 
         showModalBottomSheet(
           context: context,
           isScrollControlled: true,
+
            builder: (BuildContext context){
 
               return Container(
@@ -205,7 +243,7 @@ class _MyAppState extends State {
                             
                                 decoration: InputDecoration(
 
-                                    border: OutlineInputBorder(),
+                                    border:const OutlineInputBorder(),
                                     hintText: "Enter Date",
                                     hintStyle:const  TextStyle(
 
@@ -215,9 +253,23 @@ class _MyAppState extends State {
                                     ),
                                     suffixIcon: IconButton(
                                       
-                                      onPressed: (){
+                                      onPressed: ()async{
 
-                                         _SelectdateTime!(context);
+
+                                            DateTime? pickedDate=await showDatePicker(
+                                              context: context,
+                                              initialDate: DateTime.now(),
+                                               firstDate:DateTime (2021),
+                                              lastDate:DateTime(2025),
+                                              
+                                              );
+
+                                              String formatedDate=DateFormat.yMMMd().format(pickedDate!);
+
+                                              setState(() {
+
+                                                        dateController.text=formatedDate;
+                                              });
 
                                       }, icon:const Icon(Icons.calendar_month),
                                       
@@ -262,27 +314,16 @@ class _MyAppState extends State {
                                   ),
                             ),
                             onTap: (){
+                              
+                                if(isEdit==true){
 
-                            final String titlename=titleController.text;
-                              String descriptionname=desricptionController.text;
-                              String finaldate=dateController.text;
+                                    submitData(true,data);
+                                }
 
-                              if(titlename.isNotEmpty&&descriptionname.isNotEmpty&&finaldate.isNotEmpty){
+                                else{
 
-                                  info.add({
-
-                                        'title':titlename,
-                                        'description':descriptionname,
-                                        'date':finaldate,
-                                  });
-                              }
-
-                              setState(() {
-                                
-                                    titleController.clear();
-                                    desricptionController.clear();
-                                    dateController.clear();
-                              });
+                                    submitData(false);
+                                }
                             },
                           ),
 
@@ -300,6 +341,8 @@ class _MyAppState extends State {
            
            );
   }
+
+
 
  
   
@@ -338,7 +381,7 @@ class _MyAppState extends State {
           body: ListView.builder(
 
               shrinkWrap: true,
-              itemCount: info.length,
+              itemCount: listofCards.length,
               itemBuilder:(BuildContext context,index){
 
                   return Padding(
@@ -405,7 +448,7 @@ class _MyAppState extends State {
                                       children: [
                                    Text(
                                                                         
-                                                          "${info[index]['title']}",
+                                                          listofCards[index].title,
                                                           style:const TextStyle(
                                                                         
                                                                   fontSize: 15,
@@ -421,7 +464,7 @@ class _MyAppState extends State {
 
                                                       Text(
                                                                       
-                                                        "${info[index]['description']}",
+                                                        listofCards[index].description,
                                                         style:const TextStyle(
                                                                       
                                                                 fontSize: 13,
@@ -472,7 +515,7 @@ class _MyAppState extends State {
                                    padding: const EdgeInsets.only(left: 10),
                                    child: Text(
                                    
-                                      "${info[index]['date']}",
+                                      listofCards[index].date,
                                       style:const TextStyle(
                                    
                                       fontSize: 12,
@@ -482,17 +525,48 @@ class _MyAppState extends State {
                                                                    ),
                                  ),
 
-                              const  Row(
+                                Row(
 
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   
                                   children: [
 
-                                    Icon(Icons.edit,color: Color.fromRGBO(2, 167, 177, 1), ),
-                                     SizedBox(
+                                    IconButton(
+                                      
+                                     icon:const Icon(Icons.edit,color: Color.fromRGBO(2, 167, 177, 1),) , 
+                                      onPressed: (){
+
+
+                                            titleController.text=listofCards[index].title;
+                                            desricptionController.text=listofCards[index].description;
+                                            dateController.text=listofCards[index].date;
+                                            popUp(true,index);
+
+                                      },
+                                      
+                                      
+                                      
+                                      ),
+
+                                 const    SizedBox(
                                         width: 10,
                                     ),
-                                    Icon(Icons.delete,color: Color.fromRGBO(2, 167, 177, 1),),
+
+
+                                   
+                                    IconButton(
+                                      
+                                     icon:const Icon(Icons.delete,color: Color.fromRGBO(2, 167, 177, 1),) , 
+                                      onPressed: (){
+
+                                            listofCards.removeAt(index);
+                                            setState(() {});
+
+                                      },
+                                      
+                                      
+                                      
+                                      ),
                                  
                                   ],
                                 )
@@ -519,7 +593,7 @@ class _MyAppState extends State {
 
               onPressed: (){
 
-                    popUp();
+                    popUp(false);
               },
               child:const  Icon(Icons.add),
           )
